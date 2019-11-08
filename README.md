@@ -5,3 +5,10 @@ Pseudotargeted metabolomics is a novel method that perform high coverage metabol
 
 ## Process 
 The whole process of running the software is as follows: (1) Establish folders containing parent ion information (parent ion information from the results of XCMS and CAMERA) and product ion information (product ion information from MGF files). (2) Run MRM-Ion Pair Finder, automatically select ion pairs, output results.
+
+## How to use
+### R
+R code named "MRM_finder.R" is stored in "R" folder. The function named "MRM_finder" is used to pick ion pairs from ms1 peak detection result ans mgf files.
+
+### Matlab
+There is a user mannal saved in "Matlab" folder.

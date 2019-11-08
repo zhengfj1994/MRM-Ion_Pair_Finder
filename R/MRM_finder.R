@@ -1,3 +1,8 @@
+# Function: MRM_finder
+# Description: MRM-Ion Pair Finder performed in R
+# Author: Fujian Zheng
+# References: Analytical Chemistry 87.10(2015):5050-5055.
+
 MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_intensity,resultpath){
   # Some packages used in the function
   ##########
@@ -10,11 +15,11 @@ MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_i
   # Function: exact a matrix from mgf_data
   ##########
   createmgfmatrix <- function(mgf_data){
-    Begin_num <- grep("BEGIN IONS", mgf_data)#get 'BEGIN IONS' index
-    Pepmass_num <- grep("PEPMASS=",mgf_data)#get 'PEPMASS' index
-    RT_num <- grep("RTINSECONDS=",mgf_data)#get 'RTINSECONDS' index
-    End_num <- grep("END IONS", mgf_data)#get 'END IONS' index
-    mgf_matrix <- cbind(Begin_num,RT_num,Pepmass_num,End_num)#creat mgf_matrix
+    Begin_num <- grep("BEGIN IONS", mgf_data)
+    Pepmass_num <- grep("PEPMASS=",mgf_data)
+    RT_num <- grep("RTINSECONDS=",mgf_data)
+    End_num <- grep("END IONS", mgf_data)
+    mgf_matrix <- cbind(Begin_num,RT_num,Pepmass_num,End_num)
     
     for (i in c(1:length(Pepmass_num)))
     {
@@ -38,7 +43,7 @@ MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_i
   ##########
   
   MS2_filename <- list.files(filepath_MS2)
-  data_ms1ms2 <- cbind(before_pretreatment[1,],mzinmgf=1,rtinmgf=1,mz_ms2=1,int_ms2=1,CE=1)[-1,]  # Create data.frame to store information of ms1ms2 information
+  data_ms1ms2 <- cbind(before_pretreatment[1,], mzinmgf=1, rtinmgf=1, mz_ms2=1, int_ms2=1, CE=1)[-1,]  # Create data.frame to store information of ms1ms2 information
 
   # Reading and processing mgf files one by one.
   for (i_new in MS2_filename){
@@ -65,46 +70,25 @@ MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_i
     packageStartupMessage(paste("Deleting the data in", i_new, "with charge > 1 is finished."))
     ########
     
-    # Delete the data with diff_MS2MS1 difference between MS1 and MS2
+    # Delete the data by diff_MS2MS1 and ms2_intensity
     ########
     mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
-    pb <- tkProgressBar(paste("Delete the data in", i_new, "with diff_MS2MS1 difference between MS1 and MS2"),"rate of progress %", 0, 100)
+    pb <- tkProgressBar(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity"),"rate of progress %", 0, 100)
     for (i in c(1:length(mgf_data))){
       info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
-      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with diff_MS2MS1 difference between MS1 and MS2 (%s)"), info),info)
+      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity (%s)"), info),info)
       if (!grepl("[a-zA-Z]", mgf_data[i])){
         mz_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[1])
         int_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[2])
         mz_ms1 <- as.numeric(mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Pepmass_num"])
-        if (mz_ms1-mz_ms2<=diff_MS2MS1){
+        if (mz_ms1-mz_ms2 <= diff_MS2MS1 | int_ms2 <= ms2_intensity){
           mgf_data[i] <- NA
         }
       }
     }
     close(pb)
     mgf_data <- na.omit(mgf_data)
-    packageStartupMessage(paste("Deleting the data in", i_new, "with diff_MS2MS1 difference between MS1 and MS2 is finished."))
-    ########
-    
-    # Delete the data with ms2 intensity < ms2_intensity
-    ########
-    mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
-    pb <- tkProgressBar(paste("Delete the data in", i_new, "with ms2 intensity < ms2_intensity"),"rate of progress %", 0, 100)
-    for (i in c(1:length(mgf_data))){
-      info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
-      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with ms2 intensity < ms2_intensity (%s)"), info),info)
-      if (!grepl("[a-zA-Z]", mgf_data[i])){
-        mz_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[1])
-        int_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[2])
-        mz_ms1 <- as.numeric(mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Pepmass_num"])
-        if (int_ms2<=ms2_intensity){
-          mgf_data[i] <- NA
-        }
-      }
-    }
-    close(pb)
-    mgf_data <- na.omit(mgf_data)
-    packageStartupMessage(paste("Deleting the data in", i_new, "with ms2 intensity < ms2_intensity is finished."))
+    packageStartupMessage(paste("Deleting the data in", i_new, "by diff_MS2MS1 and ms2_intensity is finished."))
     ########
     
     # Delete the data without useful MS2
@@ -146,7 +130,6 @@ MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_i
     }
   }
   
-  # ans <- distinct(as.data.frame(rbind(before_pretreatment, cbind(data_ms1ms2[,1:ncol(before_pretreatment)]))))
   data_ms1ms2_final <- data_ms1ms2[1,][-1,]
   uniquedata_ms1ms2 <- distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
   for (i in c(1:nrow(uniquedata_ms1ms2))){
