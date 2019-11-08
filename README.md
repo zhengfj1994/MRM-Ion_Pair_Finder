@@ -1,27 +1,86 @@
-MRM-Ion Pair Finder v2.0 user manual
+# MRM Ion-Pair FInder
 
-MRM-Ion Pair Finder software is an independently developed and written program in our laboratory for large-scale selection of MRM transitions for pseudotargeted metabolomics. The Matlab (Version 7.14.739, R2012a,64-bit) is used. MRM-Ion Pair Finder v2.0 is improved on the basis of the original version, which simplifies the program and improves the running efficiency. Matlab language (R2018b, 64-bit) is used. 
-The whole process of running the software is as follows: (1) Establish folders containing parent ion information (parent ion information from the results of XCMS and CAMERA) and product ion information (product ion information from MGF files). (2) Set parameters, run MRM-Ion Pair Finder v2.0 software, automatically select ion pairs, output results.
-The instructions for the installation and use of the software are shown below:
-1	Download and extract MRM-Ion Pair Finder v2.0.zip.
-2	Select the extracted MRM-Ion Pair Finder v2.0 software folder in Matlab, as shown in Figure 1.
-3	Load data file path: Add to Path → Selected Folders and Subfolders
-4	Prepare MS1 file (csv) and MS2 files (mgf). MS1 format for MRM-Ion Pair Finder v2.0 is shown in Figure 6. PeakView (AB SCIEX, Version: 1.2.0.3) is used for transfer raw data (.wiff) to mgf file. MSConvert can also be used to get mgf files from different instruments raw file types. Peak peaking algorithm are set as continuous wavelet transform (cwt) in MSConvert. Other filters can make the data simpler and reduce the running time of MRM-Ion Pair Finder v2.0.
-5	Open folder of MRM-Ion Pair Finder v2.0, Double-click "NEW_FINDER.fig" in the left column.
-6	According to the specific experimental situation, set the software parameters, click "START" to start running the program. The functions of each parameter are shown in Table 1.
-7	The result (csv file) is automatically saved under the subfolder named with the software run-end time.      
+This is a collection of interactive courses for use with the [swirl R package](http://swirlstats.com). You'll find instructions for installing courses further down on this page. Some courses are still in development and we'd love to hear any [suggestions](https://github.com/swirldev/swirl_courses/issues/new) you have as you work through them.
 
-Table 1. MRM-Ion Pair Founder parameter meaning
-Parameters                              Meaning
-—————————————————————————————————————————————————————————————————————————————————————————————————————————
-file path (MS1)	                        MS1 and MS2 file path.
-                                        Notice：MS1 file format must be same as Figure 6, MS2 file must name as CE voltage such as 15V.mgf, 30V.mgf and 45V.mgf. The two folders are separate, and there should be no other files under the folders.
-file path (MS2)
-—————————————————————————————————————————————————————————————————————————————————————————————————————————
-tR tolerance (min)	                    tr tolerance between MS1 and MS2 files
-—————————————————————————————————————————————————————————————————————————————————————————————————————————
-m/z tolerance (Da)	                    m/z tolerance between MS1 and MS2 files
-—————————————————————————————————————————————————————————————————————————————————————————————————————————
-tolerance (MS2 intensity)	            If the response of product ion is smaller than threshold, it                                             will be deleted.
-—————————————————————————————————————————————————————————————————————————————————————————————————————————
-tolerance of MS1 and MS2	            If the m/z difference between precursor and produce ion is                                               smaller than tolerance (MS1~MS2), it will be deleted.
+For more information regarding swirl, visit [swirlstats.com](http://swirlstats.com) or the [swirl GitHub repository](https://github.com/swirldev/swirl). If you'd like to write your own interactive content, please visit the [Instructors page](http://swirlstats.com/instructors.html) of our website.
+
+Here are our current offerings, organized by level of difficulty:
+
+#### Beginner
+
+- **R Programming**: The basics of programming in R
+- [**R Programming E**](https://github.com/swirldev/R_Programming_E): Same as the original, but modified slightly for in-class use (see below ***)
+- [**The R Programming Environment**](https://swirlstats.com/scn/rpe.html)
+<!-- - **Data Analysis**: Basic ideas in statistics and data visualization -->
+<!-- - **Mathematical Biostatistics Boot Camp**: One- and two-sample t-tests, power, and sample size -->
+<!-- - **Open Intro**: A very basic introduction to statistics, data analysis, and data visualization -->
+
+\*\*\* *R Programming E is identical to R Programming, except we've eliminated the prompts for Coursera credentials at the end of each lesson and instead give students the option to send an email to their instructor notifying them of completion. Admittedly, it's sort of a hack until we come up with a more robust solution for in-class use (i.e. an instructor "dashboard").*
+
+#### Intermediate
+
+- **Regression Models**: The basics of regression modeling in R
+- **Getting and Cleaning Data**: dplyr, tidyr, lubridate, oh my!
+
+#### Advanced
+
+- **Statistical Inference**: This intermediate to advanced level course closely follows the
+[Statistical Inference course](https://www.coursera.org/course/statinference) of the Johns Hopkins 
+[Data Science Specialization](https://www.coursera.org/specialization/jhudatascience/1) on Coursera. It
+introduces the student to basic concepts of statistical inference
+including probability, hypothesis testing, confidence intervals and
+p-values. It concludes with an initiation to topics of particular
+relevance to big data, issues of multiple testing and resampling.
+- [**Advanced R Programming**](https://swirlstats.com/scn/arp.html)
+
+Since our users come from a variety backgrounds, it's very hard to label material as **Beginner**, **Intermediate**, or **Advanced**. If you find something that is labelled **Beginner** to be challenging, please don't be discouraged. The first step of learning anything is to acknowledge that you are capable of understanding it. True understanding will come with time and practice.
+
+#### Course Authors
+
+- **Writing swirl Courses**: An interactive guides and example 
+  for swirl course authors. The first group of lessons cover basics. The rest cover 
+  special topics useful primarily as samples--points of departure for one's own material.
+  For more comprehensive documentation about writing your own swirl courses see http://swirlstats.com/swirlify/.
+
+## Install and run a course automatically from swirl
+
+**This is the preferred method of installing courses.** It automates the process by allowing you to do everything right from the R console.
+
+1) Make sure you have a recent version version of swirl:
+
+```
+install.packages("swirl")
+```
+
+2) Enter the following from the R console, **substituting the name of the course** that you wish to install:
+
+```
+library(swirl)
+install_course("Course Name Here")
+swirl()
+```
+
+For example, `install_course("R Programming")` will install the R Programming course. **Please note that course names are case sensitive!**
+
+If that doesn't work for you...
+
+## Install and run a course manually
+
+If the automatic course installation method outlined above does not work for you, then there's a simple alternative.
+
+1. Find the course you want to install on the [Swirl Course network website](https://swirlstats.com/scn/title.html).
+2. Follow the manual installation instructions on the course page.
+
+If that does not work for you, consider taking a look at the 
+[legacy manual install instructions](https://github.com/swirldev/swirl_courses/wiki/Legacy-Manual-Install-Instructions-for-Swirl-Courses).
+
+## Uninstall a course
+
+If you'd like to remove a course at any time, you can use `uninstall_course("Course Name Here")`.
+
+## Using swirl in the classroom
+
+Instructors around the world are using swirl in their classrooms. We think this is awesome. If you're an instructor, please feel free to do the same -- free of charge. While your students may be paying to take your course or attend your institution, we simply ask that you don't charge people *directly* for the use of our software or instructional content.
+
+If you are not sure about a particular use case, don't hesitate to post a
+question to our [Google Group](https://groups.google.com/forum/#!forum/swirl-discuss).
