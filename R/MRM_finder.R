@@ -1,0 +1,162 @@
+MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_intensity,resultpath){
+  # Some packages used in the function
+  ##########
+  require(tcltk)
+  require(stringr)
+  require(readr)
+  require(dplyr)
+  ##########
+  
+  # Function: exact a matrix from mgf_data
+  ##########
+  createmgfmatrix <- function(mgf_data){
+    Begin_num <- grep("BEGIN IONS", mgf_data)#get 'BEGIN IONS' index
+    Pepmass_num <- grep("PEPMASS=",mgf_data)#get 'PEPMASS' index
+    RT_num <- grep("RTINSECONDS=",mgf_data)#get 'RTINSECONDS' index
+    End_num <- grep("END IONS", mgf_data)#get 'END IONS' index
+    mgf_matrix <- cbind(Begin_num,RT_num,Pepmass_num,End_num)#creat mgf_matrix
+    
+    for (i in c(1:length(Pepmass_num)))
+    {
+      pepmass <- gsub("[^0-9,.]", "", mgf_data[Pepmass_num[i]])
+      mgf_matrix[i,"Pepmass_num"] <- pepmass
+      
+      rt <- gsub("[^0-9,.]", "", mgf_data[RT_num[i]])
+      mgf_matrix[i,"RT_num"] <- rt
+    }
+    return(mgf_matrix)
+  } 
+  ##########
+  
+  # Reading csv file containing peak detection result of MS1.
+  ##########
+  before_pretreatment <- read.csv(file = filepath_MS1)
+  mz <- before_pretreatment$mz
+  rt <- before_pretreatment$rt
+  int <- before_pretreatment[ ,3:ncol(before_pretreatment)]
+  packageStartupMessage("MS1 reading is finished.")
+  ##########
+  
+  MS2_filename <- list.files(filepath_MS2)
+  data_ms1ms2 <- cbind(before_pretreatment[1,],mzinmgf=1,rtinmgf=1,mz_ms2=1,int_ms2=1,CE=1)[-1,]  # Create data.frame to store information of ms1ms2 information
+
+  # Reading and processing mgf files one by one.
+  for (i_new in MS2_filename){
+    mgf_data <- scan(paste0(filepath_MS2,'\\',i_new), what = character(0), sep = "\n")  # Read mgf file
+    mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
+    CE <- parse_number(i_new) # get CE value in the filename of mgf
+    
+    # Delete the data with charge > 1
+    ##########
+    pb <- tkProgressBar(paste("Delete the data in", i_new, "with charge > 1"),"rate of progress %", 0, 100)
+    for (i in c(1:length(mgf_data))){
+      info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
+      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with charge > 1 (%s)"), info),info)
+      # If the row of mgf_data is contain the "CHARGE=", 
+      if (!is.na(mgf_data[i]) & str_detect(mgf_data[i],"CHARGE=")){
+        if (!str_detect(mgf_data[i],"CHARGE=1")){
+          mgf_data[mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Begin_num"]:
+                   mgf_matrix[which(as.numeric(mgf_matrix[,"End_num"]) > i)[1],"End_num"]] <- NA          
+        }
+      }
+    }
+    close(pb)
+    mgf_data <- na.omit(mgf_data)
+    packageStartupMessage(paste("Deleting the data in", i_new, "with charge > 1 is finished."))
+    ########
+    
+    # Delete the data with diff_MS2MS1 difference between MS1 and MS2
+    ########
+    mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
+    pb <- tkProgressBar(paste("Delete the data in", i_new, "with diff_MS2MS1 difference between MS1 and MS2"),"rate of progress %", 0, 100)
+    for (i in c(1:length(mgf_data))){
+      info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
+      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with diff_MS2MS1 difference between MS1 and MS2 (%s)"), info),info)
+      if (!grepl("[a-zA-Z]", mgf_data[i])){
+        mz_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[1])
+        int_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[2])
+        mz_ms1 <- as.numeric(mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Pepmass_num"])
+        if (mz_ms1-mz_ms2<=diff_MS2MS1){
+          mgf_data[i] <- NA
+        }
+      }
+    }
+    close(pb)
+    mgf_data <- na.omit(mgf_data)
+    packageStartupMessage(paste("Deleting the data in", i_new, "with diff_MS2MS1 difference between MS1 and MS2 is finished."))
+    ########
+    
+    # Delete the data with ms2 intensity < ms2_intensity
+    ########
+    mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
+    pb <- tkProgressBar(paste("Delete the data in", i_new, "with ms2 intensity < ms2_intensity"),"rate of progress %", 0, 100)
+    for (i in c(1:length(mgf_data))){
+      info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
+      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with ms2 intensity < ms2_intensity (%s)"), info),info)
+      if (!grepl("[a-zA-Z]", mgf_data[i])){
+        mz_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[1])
+        int_ms2 <- as.numeric(unlist(strsplit(mgf_data[i], " "))[2])
+        mz_ms1 <- as.numeric(mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Pepmass_num"])
+        if (int_ms2<=ms2_intensity){
+          mgf_data[i] <- NA
+        }
+      }
+    }
+    close(pb)
+    mgf_data <- na.omit(mgf_data)
+    packageStartupMessage(paste("Deleting the data in", i_new, "with ms2 intensity < ms2_intensity is finished."))
+    ########
+    
+    # Delete the data without useful MS2
+    ########
+    mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))  # creat mgf_matrix
+    pb <- tkProgressBar(paste("Delete the data in", i_new, "without useful MS2"),"rate of progress %", 0, 100)
+    for (i in c(1:nrow(mgf_matrix))){
+      info<- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))  
+      setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "without useful MS2 (%s)"), info),info)
+      if (as.numeric(as.character(mgf_matrix$End_num[i])) - as.numeric(as.character(mgf_matrix$Begin_num[i])) < 5){
+        mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))] <- NA
+      }
+    }
+    close(pb)
+    mgf_data <- na.omit(mgf_data)
+    packageStartupMessage(paste("Deleting the data in", i_new, "without useful MS2 is finished."))
+    ########
+    
+    # Combine ms1 and ms2
+    mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))
+    for (i in c(1:nrow(mgf_matrix))){
+      mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
+      rtinmgf <- as.numeric(as.character(mgf_matrix$RT_num[i]))
+      posi <- which(abs(before_pretreatment$mz-mzinmgf)<tol_mz & abs(before_pretreatment$rt-rtinmgf)<tol_rt*60)
+      if (length(posi)>=1){
+        posi <- posi[1]
+        ms1info <- before_pretreatment[posi,]
+        for (j in mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))]){
+          if (grepl("[a-zA-Z]", j)){
+            next()
+          }else{
+            mz_ms2 <- as.numeric(unlist(strsplit(j, " "))[1])
+            int_ms2 <- as.numeric(unlist(strsplit(j, " "))[2])
+            ms1ms2conb <- cbind(ms1info,mzinmgf,rtinmgf,mz_ms2,int_ms2,CE)
+            data_ms1ms2 <- rbind(data_ms1ms2,ms1ms2conb)
+          }
+        }
+      }
+    }
+  }
+  
+  # ans <- distinct(as.data.frame(rbind(before_pretreatment, cbind(data_ms1ms2[,1:ncol(before_pretreatment)]))))
+  data_ms1ms2_final <- data_ms1ms2[1,][-1,]
+  uniquedata_ms1ms2 <- distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
+  for (i in c(1:nrow(uniquedata_ms1ms2))){
+    posi <- which(data_ms1ms2$mz==uniquedata_ms1ms2$mz[i] & data_ms1ms2$rt==uniquedata_ms1ms2$rt[i])
+    temp <- data_ms1ms2[posi,]
+    posi <- which(temp$int_ms2 == max(temp$int_ms2))
+    temp <- temp[posi[1],]
+    data_ms1ms2_final <- rbind(data_ms1ms2_final,temp)
+  }
+  setwd(resultpath)
+  write.csv(data_ms1ms2_final,file = "MRM transitions list.csv",row.names = FALSE)
+  return(data_ms1ms2_final)
+}
