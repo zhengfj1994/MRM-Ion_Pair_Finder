@@ -1,6 +1,5 @@
 # Function: MRM_finder
 # Description: MRM-Ion Pair Finder performed in R
-# Author: Fujian Zheng
 # References: Analytical Chemistry 87.10(2015):5050-5055.
 # Parameters: file_MS1: MS1 peak detection result save in .csv filetype, the first column is m/z named 'mz',
 #                       the second column is retention time(s) named 'rt',
