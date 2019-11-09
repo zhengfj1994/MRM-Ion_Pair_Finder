@@ -1,7 +1,8 @@
+# An example code to show how to use MRM_finder.
 
 source("D:\\github\\MRM-Ion_Pair_Finder\\R\\MRM_finder.R")
 
-data_ms1ms2_final <- MRM_finder(filepath_MS1 = "D:\\github\\MRM-Ion_Pair_Finder\\Data\\MS1\\Delete Iso-Add Result.csv",
+data_ms1ms2_final <- MRM_finder(file_MS1 = "D:\\github\\MRM-Ion_Pair_Finder\\Data\\MS1\\Delete Iso-Add Result.csv",
                                 filepath_MS2 = "D:\\github\\MRM-Ion_Pair_Finder\\Data\\MS2",
                                 tol_mz = 0.01,
                                 tol_rt = 0.2,

@@ -2,8 +2,23 @@
 # Description: MRM-Ion Pair Finder performed in R
 # Author: Fujian Zheng
 # References: Analytical Chemistry 87.10(2015):5050-5055.
+# Parameters: file_MS1: MS1 peak detection result save in .csv filetype, the first column is m/z named 'mz',
+#                       the second column is retention time(s) named 'rt',
+#                       intensity of samples is located begin the third column.
+#             filepath_MS2: The folder path which have mgf files.
+#             tol_mz(Da): The tolerence of m/z between MS1 peak detection result and mgf files. 0.01 is suitable for Q-TOF.
+#             tol_rt(min): The tolerence of retention time between MS1 peak detection result and mgf files.
+#             diff_MS2MS1(Da): The smallest difference between product ion and precusor ion.
+#             ms2_intensity: The smallest intensity of product ion.
+#             resultpath: A csv file named "MRM transitions list.csv" will saved in the path.
 
-MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_intensity,resultpath){
+MRM_finder <- function(file_MS1,
+                       filepath_MS2,
+                       tol_mz,
+                       tol_rt,
+                       diff_MS2MS1,
+                       ms2_intensity,
+                       resultpath){
   # Some packages used in the function
   ##########
   require(tcltk)
@@ -35,7 +50,7 @@ MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_i
   
   # Reading csv file containing peak detection result of MS1.
   ##########
-  before_pretreatment <- read.csv(file = filepath_MS1)
+  before_pretreatment <- read.csv(file = file_MS1)
   mz <- before_pretreatment$mz
   rt <- before_pretreatment$rt
   int <- before_pretreatment[ ,3:ncol(before_pretreatment)]
@@ -112,7 +127,7 @@ MRM_finder <- function(filepath_MS1,filepath_MS2,tol_mz,tol_rt,diff_MS2MS1,ms2_i
     for (i in c(1:nrow(mgf_matrix))){
       mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
       rtinmgf <- as.numeric(as.character(mgf_matrix$RT_num[i]))
-      posi <- which(abs(before_pretreatment$mz-mzinmgf)<tol_mz & abs(before_pretreatment$rt-rtinmgf)<tol_rt*60)
+      posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$rt-rtinmgf) < tol_rt*60)
       if (length(posi)>=1){
         posi <- posi[1]
         ms1info <- before_pretreatment[posi,]

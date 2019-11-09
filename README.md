@@ -8,7 +8,7 @@ The whole process of running the software is as follows: (1) Establish folders c
 
 ## How to use
 ### R
-R code named "MRM_finder.R" is stored in "R" folder. The function named "MRM_finder" is used to pick ion pairs from ms1 peak detection result ans mgf files.
+R code named "MRM_finder.R" is stored in "R" folder. The function named "MRM_finder" is used to pick ion pairs from ms1 peak detection result and mgf files.
 
 ### Matlab
 There is a user mannal saved in "Matlab" folder.
