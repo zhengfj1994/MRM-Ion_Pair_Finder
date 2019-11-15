@@ -51,7 +51,7 @@ MRM_finder <- function(file_MS1,
   ##########
   before_pretreatment <- read.csv(file = file_MS1)
   mz <- before_pretreatment$mz
-  rt <- before_pretreatment$rt
+  tr <- before_pretreatment$tr
   int <- before_pretreatment[ ,3:ncol(before_pretreatment)]
   packageStartupMessage("MS1 reading is finished.")
   ##########
@@ -126,7 +126,7 @@ MRM_finder <- function(file_MS1,
     for (i in c(1:nrow(mgf_matrix))){
       mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
       rtinmgf <- as.numeric(as.character(mgf_matrix$RT_num[i]))
-      posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$rt-rtinmgf) < tol_rt*60)
+      posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$tr-rtinmgf) < tol_rt*60)
       if (length(posi)>=1){
         posi <- posi[1]
         ms1info <- before_pretreatment[posi,]
