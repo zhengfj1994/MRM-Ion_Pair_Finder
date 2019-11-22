@@ -1,4 +1,4 @@
-# Function: MRM_finder
+# Function: MRM_Ion_Pair_Finder
 # Description: MRM-Ion Pair Finder performed in R
 # References: Analytical Chemistry 87.10(2015):5050-5055.
 # Parameters: file_MS1: MS1 peak detection result save in .csv filetype, the first column is m/z named 'mz',
@@ -11,7 +11,7 @@
 #             ms2_intensity: The smallest intensity of product ion.
 #             resultpath: A csv file named "MRM transitions list.csv" will saved in the path.
 
-MRM_finder <- function(file_MS1,
+MRM_Ion_Pair_Finder <- function(file_MS1,
                        filepath_MS2,
                        tol_mz,
                        tol_rt,

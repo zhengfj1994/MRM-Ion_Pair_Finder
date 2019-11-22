@@ -3,43 +3,39 @@ library(MSnbase)
 library(CAMERA)
 library(stringr)
 
-##Get the full path to the mzXML files
-mzxml <- dir('###',full.names = T,recursive = TRUE)
+# Get the full path to the mzXML files
+mzxml <- dir('D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML',full.names = T,recursive = TRUE)
 mzxml
 
-## Peak detection & alignment
+# Peak detection & alignment
 xset <- xcmsSet(mzxml, ppm = 20, snthresh = 3, method = 'centWave', peakwidth = c(8, 30), noise= 1000)
-
 xset2 <- group(xset, minfrac = 1)
 xset2 <- retcor(xset2, method = 'obiwarp', plottype = 'deviation')
 xset2 <- group(xset2, bw = 20, minfrac = 1)
-## Filling gaps
-xset3<-fillPeaks(xset2)
-feature.info <- xcms::groups(xset3)
-feature.info
 
-#Create an xsAnnotate object
+# Filling gaps
+xset3 <- fillPeaks(xset2)
+feature.info <- xcms::groups(xset3)
+
+# Create an xsAnnotate object
 xa <- xsAnnotate(xset3)
-#Group after RT value of the xcms grouped peak
+# Group after RT value of the xcms grouped peak
 xag <- groupFWHM(xa, perfwhm=0.6)
-#Verify grouping
+# Verify grouping
 xac <- groupCorr(xag)
 
-#Annotate isotopes, could be done before groupCorr
+# Annotate isotopes, could be done before groupCorr
 xac.isotope <- findIsotopes(xac)
 
-#Annotate adducts
+# Annotate adducts
 xac.addu <- findAdducts(xac.isotope, polarity="positive")
 
-#Get final peaktable and store on harddrive
+# Get final peaktable and store on harddrive
 res.anno <- getPeaklist(xac.addu)
-res.anno
+write.csv(res.anno,file="D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML\\Peak dectection Result.csv")
 
-
-write.csv(res.anno,file="###\\Peak dectection Result.csv")
-
-#Change to MRM
-csv_file <- read.csv('###\\Peak dectection Result.csv')
+# Remove redundant features 
+csv_file <- read.csv('D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML\\Peak dectection Result.csv')
 csv_file <- as.vector(csv_file)
 isotope <- as.character(csv_file[, 13])
 
@@ -130,4 +126,4 @@ for (i in (c(length(Adduct) : 2)))
 csv_file <- unique(csv_file)
 csv_file <- csv_file[,-14]
 csv_file <- csv_file[,-13]
-write.csv(csv_file,'###\\Delete Iso-Add Result.csv')
+write.csv(csv_file,'D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML\\Delete Iso-Add Result.csv')
