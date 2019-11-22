@@ -8,7 +8,7 @@ MRM-Ion Pair Finder is used to automatically and systematically define MRM trans
 
 ## How to use
 ### R
-There is a function named "MRM_finder" in the "R" folder. The function is used to pick ion pairs from ms1 peak detection result and mgf files. And we provided an example which can be seen in the same folder.
+There is a function named "MRM_Ion_Pair_Finder" in the "R" folder. The function is used to pick ion pairs from MS1 peak detection result and mgf files. And we provided an example which can be seen in the same folder.
 #### Parameters of MRM_finder
 |Parameters 	|Meaning                                                |
 |:--------------|:------------------------------------------------------|
@@ -22,3 +22,10 @@ There is a function named "MRM_finder" in the "R" folder. The function is used t
 
 ### Matlab
 There is a user mannal in "Matlab" folder. 
+
+### Codes for peak detection and annotation
+We provide the codes for peak detection, peak annotation and removing rundant features in the folder named "Peak detection and annotation". Users should used suitable parameters for peak detection and annoation and notice the ion mode.
+
+### Codes for retention time calibration
+We provide the codes for retention time calibration in the folder named "Retention time calibration". And we give the example data which are saved in .txt files. Users can easily calibrate retention time by using these codes.
+
