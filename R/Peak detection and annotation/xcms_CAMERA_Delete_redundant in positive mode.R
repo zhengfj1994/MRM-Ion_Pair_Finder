@@ -1,3 +1,5 @@
+# Used for peak detection and annotation
+
 library(xcms)
 library(MSnbase)
 library(CAMERA)
