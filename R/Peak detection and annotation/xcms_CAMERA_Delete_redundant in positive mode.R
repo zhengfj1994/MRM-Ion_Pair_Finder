@@ -39,7 +39,10 @@ write.csv(res.anno,file="D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML\\Peak dect
 # Remove redundant features 
 csv_file <- read.csv('D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML\\Peak dectection Result.csv')
 csv_file <- as.vector(csv_file)
-isotope <- as.character(csv_file[, 13])
+isotopePosi <- which(colnames(csv_file)=='isotopes')
+adductPosi <- which(colnames(csv_file)=='adduct')
+pcgroupPosi <- which(colnames(csv_file)=='pcgroup')
+isotope <- as.character(csv_file[, isotopePosi])
 
 for (i in (c(length(isotope) : 1)))
 {
@@ -54,8 +57,8 @@ for (i in (c(length(isotope) : 1)))
 	}
 }
 
-Adduct <- as.vector(csv_file[, 14])
-pcgroup <- as.vector(csv_file[, 15])
+Adduct <- as.vector(csv_file[, adductPosi])
+pcgroup <- as.vector(csv_file[, pcgroupPosi])
 
 for (i in (c(length(Adduct) : 2)))
 {
@@ -126,6 +129,6 @@ for (i in (c(length(Adduct) : 2)))
 	}
 }
 csv_file <- unique(csv_file)
-csv_file <- csv_file[,-14]
-csv_file <- csv_file[,-13]
+csv_file <- csv_file[,-adductPosi]
+csv_file <- csv_file[,-isotopePosi]
 write.csv(csv_file,'D:\\github\\MRM-Ion_Pair_Finder\\Data\\mzXML\\Delete Iso-Add Result.csv')
