@@ -2,11 +2,11 @@
 # Description: MRM-Ion Pair Finder performed in R
 # References: Analytical Chemistry 87.10(2015):5050-5055.
 # Parameters: file_MS1: MS1 peak detection result save in .csv filetype, the first column is m/z named 'mz',
-#                       the second column is retention time(s) named 'rt',
+#                       the second column is retention time(s) named 'tr',
 #                       intensity of samples is located begin the third column.
 #             filepath_MS2: The folder path which have mgf files.
 #             tol_mz(Da): The tolerence of m/z between MS1 peak detection result and mgf files. 0.01 is suitable for Q-TOF.
-#             tol_rt(min): The tolerence of retention time between MS1 peak detection result and mgf files.
+#             tol_tr(min): The tolerence of retention time between MS1 peak detection result and mgf files.
 #             diff_MS2MS1(Da): The smallest difference between product ion and precusor ion.
 #             ms2_intensity: The smallest intensity of product ion.
 #             resultpath: A csv file named "MRM transitions list.csv" will saved in the path.
@@ -14,7 +14,7 @@
 MRM_Ion_Pair_Finder <- function(file_MS1,
                        filepath_MS2,
                        tol_mz,
-                       tol_rt,
+                       tol_tr,
                        diff_MS2MS1,
                        ms2_intensity,
                        resultpath){
@@ -31,17 +31,17 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   createmgfmatrix <- function(mgf_data){
     Begin_num <- grep("BEGIN IONS", mgf_data)
     Pepmass_num <- grep("PEPMASS=",mgf_data)
-    RT_num <- grep("RTINSECONDS=",mgf_data)
+    TR_num <- grep("RTINSECONDS=",mgf_data)
     End_num <- grep("END IONS", mgf_data)
-    mgf_matrix <- cbind(Begin_num,RT_num,Pepmass_num,End_num)
+    mgf_matrix <- cbind(Begin_num,TR_num,Pepmass_num,End_num)
     
     for (i in c(1:length(Pepmass_num)))
     {
       pepmass <- gsub("[^0-9,.]", "", mgf_data[Pepmass_num[i]])
       mgf_matrix[i,"Pepmass_num"] <- pepmass
       
-      rt <- gsub("[^0-9,.]", "", mgf_data[RT_num[i]])
-      mgf_matrix[i,"RT_num"] <- rt
+      tr <- gsub("[^0-9,.]", "", mgf_data[TR_num[i]])
+      mgf_matrix[i,"TR_num"] <- tr
     }
     return(mgf_matrix)
   } 
@@ -57,7 +57,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   ##########
   
   MS2_filename <- list.files(filepath_MS2)
-  data_ms1ms2 <- cbind(before_pretreatment[1,], mzinmgf=1, rtinmgf=1, mz_ms2=1, int_ms2=1, CE=1)[-1,]  # Create data.frame to store information of ms1ms2 information
+  data_ms1ms2 <- cbind(before_pretreatment[1,], mzinmgf=1, trinmgf=1, mz_ms2=1, int_ms2=1, CE=1)[-1,]  # Create data.frame to store information of ms1ms2 information
 
   # Reading and processing mgf files one by one.
   for (i_new in MS2_filename){
@@ -125,8 +125,8 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))
     for (i in c(1:nrow(mgf_matrix))){
       mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
-      rtinmgf <- as.numeric(as.character(mgf_matrix$RT_num[i]))
-      posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$tr-rtinmgf) < tol_rt*60)
+      trinmgf <- as.numeric(as.character(mgf_matrix$TR_num[i]))
+      posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$tr-trinmgf) < tol_tr*60)
       if (length(posi)>=1){
         posi <- posi[1]
         ms1info <- before_pretreatment[posi,]
@@ -136,7 +136,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
           }else{
             mz_ms2 <- as.numeric(unlist(strsplit(j, " "))[1])
             int_ms2 <- as.numeric(unlist(strsplit(j, " "))[2])
-            ms1ms2conb <- cbind(ms1info,mzinmgf,rtinmgf,mz_ms2,int_ms2,CE)
+            ms1ms2conb <- cbind(ms1info,mzinmgf,trinmgf,mz_ms2,int_ms2,CE)
             data_ms1ms2 <- rbind(data_ms1ms2,ms1ms2conb)
           }
         }
@@ -147,7 +147,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   data_ms1ms2_final <- data_ms1ms2[1,][-1,]
   uniquedata_ms1ms2 <- distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
   for (i in c(1:nrow(uniquedata_ms1ms2))){
-    posi <- which(data_ms1ms2$mz==uniquedata_ms1ms2$mz[i] & data_ms1ms2$rt==uniquedata_ms1ms2$rt[i])
+    posi <- which(data_ms1ms2$mz==uniquedata_ms1ms2$mz[i] & data_ms1ms2$tr==uniquedata_ms1ms2$tr[i])
     temp <- data_ms1ms2[posi,]
     posi <- which(temp$int_ms2 == max(temp$int_ms2))
     temp <- temp[posi[1],]
