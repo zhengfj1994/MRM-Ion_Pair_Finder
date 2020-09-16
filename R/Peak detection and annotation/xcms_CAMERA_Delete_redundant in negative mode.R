@@ -108,8 +108,8 @@ for (i in (c(length(Adduct) : 2)))
 					mz_m12 <- str_subset(add_format2, k)
 					if (length(str_length(mz_m12)) >= 1 & pcgroup[i] == pcgroup[j])
 					{
-						int_i <- sum(csv_file[i,10:]+csv_file[i,11]+csv_file[i,12]
-						int_j <- csv_file[j,10]+csv_file[j,11]+csv_file[j,12]
+					  int_i <- sum(csv_file[i,10:(isotopePosi-1)])
+					  int_j <- sum(csv_file[j,10:(isotopePosi-1)])
 						if (int_i <= int_j)
 						{
 							delete_count <- delete_count + 1

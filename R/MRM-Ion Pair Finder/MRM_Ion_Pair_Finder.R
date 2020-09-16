@@ -50,6 +50,14 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   # Reading csv file containing peak detection result of MS1.
   ##########
   before_pretreatment <- read.csv(file = file_MS1)
+  if (length(which(colnames(before_pretreatment)=="tr")) >= 1) {}
+  else if (length(which(colnames(before_pretreatment)=="tr")) == 0 & length(which(colnames(before_pretreatment)=="rt")) >= 1){
+    colnames(before_pretreatment)[which(colnames(before_pretreatment)=="rt")] = "tr"
+  }
+  else {
+    packageStartupMessage("Row names of MS1 file is wrong!")
+    break()
+  }
   mz <- before_pretreatment$mz
   tr <- before_pretreatment$tr
   int <- before_pretreatment[ ,3:ncol(before_pretreatment)]
