@@ -37,7 +37,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     
     for (i in c(1:length(Pepmass_num)))
     {
-      pepmass <- gsub("[^0-9,.]", "", mgf_data[Pepmass_num[i]])
+      pepmass <- gsub("[^0-9,.]", "", strsplit(mgf_data[Pepmass_num[i]],split = " ")[[1]][1])
       mgf_matrix[i,"Pepmass_num"] <- pepmass
       
       tr <- gsub("[^0-9,.]", "", mgf_data[TR_num[i]])
@@ -66,7 +66,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   
   MS2_filename <- list.files(filepath_MS2)
   data_ms1ms2 <- cbind(before_pretreatment[1,], mzinmgf=1, trinmgf=1, mz_ms2=1, int_ms2=1, CE=1)[-1,]  # Create data.frame to store information of ms1ms2 information
-
+  
   # Reading and processing mgf files one by one.
   for (i_new in MS2_filename){
     mgf_data <- scan(paste0(filepath_MS2,'\\',i_new), what = character(0), sep = "\n")  # Read mgf file

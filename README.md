@@ -34,3 +34,11 @@ We provide the codes for retention time calibration in the folder named "Retenti
 ## Contact us
 If you have any problems when you use MRM_Ion_Pair_Finder. Please contact us, you can send an emial to zhengfj@dicp.ac.cn
 
+## revision history
+
+### 2020/09/16
+Modified column name support in MS1 file. The modified version supports the use of "tr" or "rt" abbreviations for retention time column names.
+
+### 2020/09/28
+Expanded format support for mgf files
+
