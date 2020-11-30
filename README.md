@@ -19,6 +19,9 @@ There is a function named "MRM_Ion_Pair_Finder" in the "R" folder. The function 
 |diff_MS2MS1	|smallest tolerance between precusor and product ion    |
 |ms2_intensity  |smallest intensity of product ion                      |
 |resultpath     |result(.csv) filepath                                  |
+|OnlyKeepChargeEqual1 |If TRUE, only keep the MS2 spectra with charge = 1. |
+
+
 #### Notice！！！
 The csv file of file_MS1 should follow the format as described in the pseudotargeted metabolomics paper (https://pubmed.ncbi.nlm.nih.gov/32581297/). It should contains "mz", "tr", and the columns for intensity.
 

@@ -17,7 +17,8 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
                        tol_tr,
                        diff_MS2MS1,
                        ms2_intensity,
-                       resultpath){
+                       resultpath,
+                       OnlyKeepChargeEqual1 = TRUE){
   # Some packages used in the function
   ##########
   require(tcltk)
@@ -73,24 +74,26 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
     CE <- parse_number(i_new) # get CE value in the filename of mgf
     
-    # Delete the data with charge > 1
-    ##########
-    pb <- tkProgressBar(paste("Delete the data in", i_new, "with charge > 1"),"rate of progress %", 0, 100)
-    for (i in c(1:length(mgf_data))){
-      info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
-      setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with charge > 1 (%s)"), info),info)
-      # If the row of mgf_data is contain the "CHARGE=", 
-      if (!is.na(mgf_data[i]) & str_detect(mgf_data[i],"CHARGE=")){
-        if (!str_detect(mgf_data[i],"CHARGE=1")){
-          mgf_data[mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Begin_num"]:
-                   mgf_matrix[which(as.numeric(mgf_matrix[,"End_num"]) > i)[1],"End_num"]] <- NA          
+    if (OnlyKeepChargeEqual1 == TRUE){
+      # Delete the data with charge > 1
+      ##########
+      pb <- tkProgressBar(paste("Delete the data in", i_new, "with charge > 1"),"rate of progress %", 0, 100)
+      for (i in c(1:length(mgf_data))){
+        info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data))) 
+        setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with charge > 1 (%s)"), info),info)
+        # If the row of mgf_data is contain the "CHARGE=", 
+        if (!is.na(mgf_data[i]) & str_detect(mgf_data[i],"CHARGE=")){
+          if (!str_detect(mgf_data[i],"CHARGE=1")){
+            mgf_data[mgf_matrix[tail(which(as.numeric(mgf_matrix[,"Begin_num"]) < i),1),"Begin_num"]:
+                       mgf_matrix[which(as.numeric(mgf_matrix[,"End_num"]) > i)[1],"End_num"]] <- NA          
+          }
         }
       }
+      close(pb)
+      mgf_data <- na.omit(mgf_data)
+      packageStartupMessage(paste("Deleting the data in", i_new, "with charge > 1 is finished."))
+      ########
     }
-    close(pb)
-    mgf_data <- na.omit(mgf_data)
-    packageStartupMessage(paste("Deleting the data in", i_new, "with charge > 1 is finished."))
-    ########
     
     # Delete the data by diff_MS2MS1 and ms2_intensity
     ########
