@@ -13,11 +13,11 @@
 #'
 #' @return data_ms1ms2_final
 #' @export MRM_Ion_Pair_Finder
-#' @import dplyr
-#' @import readr
-#' @import stringr
-#' @import tcltk
-#' @import tidyr
+#' @importFrom readr parse_number
+#' @importFrom stringr str_detect
+#' @importFrom tcltk tkProgressBar setTkProgressBar
+#' @importFrom tidyr separate
+#' @importFrom dplyr distinct
 #' @importFrom utils write.csv read.csv
 #' @importFrom stats na.omit
 
@@ -29,14 +29,6 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
                        ms2_intensity,
                        resultpath,
                        OnlyKeepChargeEqual1 = TRUE){
-  # Some packages used in the function
-  ##########
-  require(tcltk)
-  require(stringr)
-  require(readr)
-  require(dplyr)
-  require(tidyr)
-  ##########
 
   # Function: exact a matrix from mgf_data
   ##########
@@ -97,13 +89,13 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   for (i_new in MS2_filename){
     mgf_data <- scan(paste0(filepath_MS2,'\\',i_new), what = character(0), sep = "\n")  # Read mgf file
     mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
-    CE <- parse_number(i_new) # get CE value in the filename of mgf
+    CE <- readr::parse_number(i_new) # get CE value in the filename of mgf
 
     if (OnlyKeepChargeEqual1 == TRUE){
       # Delete the data with charge > 1
       ##########
       packageStartupMessage(paste("Deleting the data in", i_new, "with charge > 1."))
-      pb <- tkProgressBar(paste("Delete the data in", i_new, "with charge > 1"),"rate of progress %", 0, 100)
+      pb <- tcltk::tkProgressBar(paste("Delete the data in", i_new, "with charge > 1"),"rate of progress %", 0, 100)
       # for (i in c(1:length(mgf_data))){
       #   info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data)))
       #   setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "with charge > 1 (%s)"), info),info)
@@ -117,9 +109,9 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
       # }
       for (i in c(1:nrow(mgf_matrix))){
         info<- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
-        setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "with charge > 1 (%s)"), info),info)
+        tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "with charge > 1 (%s)"), info),info)
         # If the row of mgf_data is contain the "CHARGE=",
-        if (!(is.na(mgf_matrix[i, "Charge_num"]) | str_detect(mgf_matrix[i, "Charge_num"],"1"))){
+        if (!(is.na(mgf_matrix[i, "Charge_num"]) | stringr::str_detect(mgf_matrix[i, "Charge_num"],"1"))){
           mgf_data[mgf_matrix[i, "Begin_num"]:mgf_matrix[i, "End_num"]] <- NA
         }
       }
@@ -133,7 +125,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     ########
     mgf_matrix <- createmgfmatrix(mgf_data)  # create mgf_matrix
     packageStartupMessage(paste("Deleting the data in", i_new, "by diff_MS2MS1 and ms2_intensity."))
-    pb <- tkProgressBar(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity"),"rate of progress %", 0, 100)
+    pb <- tcltk::tkProgressBar(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity"),"rate of progress %", 0, 100)
     # for (i in c(1:length(mgf_data))){
     #   info<- sprintf("rate of progress %d%%", round(i*100/length(mgf_data)))
     #   setTkProgressBar(pb, i*100/length(mgf_data), sprintf(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity (%s)"), info),info)
@@ -154,13 +146,13 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
 
     if (length(strsplit(first.temp.df[1,1], split = " ")[[1]]) == 2){
       for (i in c(1:nrow(mgf_matrix))){
-        info<- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
-        setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity (%s)"), info),info)
+        info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
+        tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity (%s)"), info),info)
         mgf_data_i <- mgf_data[mgf_matrix$Begin_num[i]:mgf_matrix$End_num[i]]
         ithID <- !grepl("[a-zA-Z]", mgf_data_i)
         ith.temp.df <- as.data.frame(mgf_data_i[ithID])
         colnames(ith.temp.df) <- "ion_int"
-        ith.temp.df <- separate(ith.temp.df,"ion_int",into = c("ion", "intensity"),sep = " ")
+        ith.temp.df <- tidyr::separate(ith.temp.df,"ion_int",into = c("ion", "intensity"),sep = " ")
 
         mz_ms1 <- as.numeric(mgf_matrix[i,"Pepmass_num"])
         deleteID <- which(mz_ms1-as.numeric(ith.temp.df$ion) <= diff_MS2MS1 | as.numeric(ith.temp.df$intensity) <= ms2_intensity)
@@ -171,13 +163,13 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     }
     else {
       for (i in c(1:nrow(mgf_matrix))){
-        info<- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
-        setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity (%s)"), info),info)
+        info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
+        tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "by diff_MS2MS1 and ms2_intensity (%s)"), info),info)
         mgf_data_i <- mgf_data[mgf_matrix$Begin_num[i]:mgf_matrix$End_num[i]]
         ithID <- !grepl("[a-zA-Z]", mgf_data_i)
         ith.temp.df <- as.data.frame(mgf_data_i[ithID])
         colnames(ith.temp.df) <- "ion_int_charge"
-        ith.temp.df <- separate(ith.temp.df,"ion_int_charge",into = c("ion", "intensity","charge"),sep = " ")
+        ith.temp.df <- tidyr::separate(ith.temp.df,"ion_int_charge",into = c("ion", "intensity","charge"),sep = " ")
 
         mz_ms1 <- as.numeric(mgf_matrix[i,"Pepmass_num"])
         deleteID <- which(mz_ms1-as.numeric(ith.temp.df$ion) <= diff_MS2MS1 | as.numeric(ith.temp.df$intensity) <= ms2_intensity)
@@ -195,10 +187,10 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     ########
     mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))  # creat mgf_matrix
     packageStartupMessage(paste("Deleting the data in", i_new, "without useful MS2."))
-    pb <- tkProgressBar(paste("Delete the data in", i_new, "without useful MS2"),"rate of progress %", 0, 100)
+    pb <- tcltk::tkProgressBar(paste("Delete the data in", i_new, "without useful MS2"),"rate of progress %", 0, 100)
     for (i in c(1:nrow(mgf_matrix))){
-      info<- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
-      setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "without useful MS2 (%s)"), info),info)
+      info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
+      tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "without useful MS2 (%s)"), info),info)
       if (as.numeric(as.character(mgf_matrix$End_num[i])) - as.numeric(as.character(mgf_matrix$Begin_num[i])) < 5){
         mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))] <- NA
       }
@@ -233,7 +225,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
   }
 
   data_ms1ms2_final <- data_ms1ms2[1,][-1,]
-  uniquedata_ms1ms2 <- distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
+  uniquedata_ms1ms2 <- dplyr::distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
   for (i in c(1:nrow(uniquedata_ms1ms2))){
     posi <- which(data_ms1ms2$mz==uniquedata_ms1ms2$mz[i] & data_ms1ms2$tr==uniquedata_ms1ms2$tr[i])
     temp <- data_ms1ms2[posi,]
@@ -241,8 +233,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     temp <- temp[posi[1],]
     data_ms1ms2_final <- rbind(data_ms1ms2_final,temp)
   }
-  setwd(resultpath)
-  write.csv(data_ms1ms2_final,file = "MRM transitions list.csv",row.names = FALSE)
+  write.csv(data_ms1ms2_final,file = paste0(resultpath, "/", "MRM transitions list.csv"),row.names = FALSE)
   packageStartupMessage("MRM Ion Pair Finder is finished.")
   return(data_ms1ms2_final)
 }

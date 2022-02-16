@@ -4,13 +4,12 @@ Title: MRM-Ion Pair Finder
 Version: 2.0.0
 Author: Zheng Fujian
 Maintainer: Zheng Fujian <zhengfj@dicp.ac.cn>
-Imports: dplyr,
-         readr,
+Imports: readr,
          stringr,
-         tidyr,
-         tcltk
+         dplyr,
+         tidyr
 Description: MRM-Ion Pair Finder for pseudotargeted metabolomics.
 License: GPL
 Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.1.1
+LazyData: TRUE
+RoxygenNote: 7.1.2
