@@ -43,5 +43,7 @@ If you have any problems when you use MRM_Ion_Pair_Finder. Please contact us, yo
 Modified column name support in MS1 file. The modified version supports the use of "tr" or "rt" abbreviations for retention time column names.
 
 ### 2020/09/28
-Expanded format support for mgf files
+Expanded format support for mgf files.
 
+### 2021/02/16
+Improve the efficiency of the R language and visualize it based on shiny. Remove the Matlab version.
