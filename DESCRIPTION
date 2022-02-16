@@ -8,6 +8,10 @@ Imports: readr,
          stringr,
          dplyr,
          tidyr
+Suggest: shiny,
+         shinydashboard,
+         shinycssloaders,
+         shinyjs
 Description: MRM-Ion Pair Finder for pseudotargeted metabolomics.
 License: GPL
 Encoding: UTF-8

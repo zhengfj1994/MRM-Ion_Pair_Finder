@@ -203,7 +203,10 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
     # Combine ms1 and ms2
     mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))
     packageStartupMessage(paste("Combining MS1 and MS2."))
+    pb <- tcltk::tkProgressBar(paste("Combining MS1 and MS2 of", i_new),"rate of progress %", 0, 100)
     for (i in c(1:nrow(mgf_matrix))){
+      info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
+      tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Combining MS1 and MS2 of", i_new, "(%s)"), info),info)
       mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
       trinmgf <- as.numeric(as.character(mgf_matrix$TR_num[i]))
       posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$tr-trinmgf) < tol_tr*60)
@@ -222,6 +225,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
         }
       }
     }
+    close(pb)
   }
 
   data_ms1ms2_final <- data_ms1ms2[1,][-1,]
