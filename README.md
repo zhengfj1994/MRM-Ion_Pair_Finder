@@ -7,32 +7,81 @@ Pseudotargeted metabolomics is a novel method that perform high coverage metabol
 MRM-Ion Pair Finder is used to automatically and systematically define MRM transitions from untargeted metabolomics data. Our research group first introduced the concept of pseudotargeted metabolomics using the retention time locking GC-MS-selected ions monitoring in 2012. The pseudotargeted metabolomics method was extended to LC-MS in 2013. To define ion pairs automatically and systematically, the in-house software “Mul-tiple Reaction Monitoring-Ion Pair Finder (MRM-Ion Pair Finder)” was developed, which made defining of the MRM transitions for untargeted metabolic profiling easier and less time consuming. Recently, MRM-Ion Pair Finder was updated to version 2.0. The new version is more convenient, consumes less time and is also suitable for negative ion mode. And the function of MRM-Ion Pair Finder is also performed in R so that users have more options when using pseudotargeted method.
 
 ## How to use
-### R
-There is a function named "MRM_Ion_Pair_Finder" in the "R" folder. The function is used to pick ion pairs from MS1 peak detection result and mgf files. And we provided an example which can be seen in the same folder.
-#### Parameters of MRM_Ion_Pair_Finder
-|Parameters 	|Meaning                                                |
-|:--------------|:------------------------------------------------------|
-|file_MS1	    |MS1 file (.csv)                                        |
-|filepath_MS2   |filepath of MS2 file (.mgf)                            |
-|tol_mz         |m/z tolerance between MS1 and MS2 files                |
-|tol_rt	        |retention time tolerance between MS1 and MS2 files     |
-|diff_MS2MS1	|smallest tolerance between precusor and product ion    |
-|ms2_intensity  |smallest intensity of product ion                      |
-|resultpath     |result(.csv) filepath                                  |
-|OnlyKeepChargeEqual1 |If TRUE, only keep the MS2 spectra with charge = 1. |
+#### R
+
+We package the functions of MRM-Ion Pair Finder into an R language package called MRMFinder, which is convenient for users to download, install and use.
+
+To install MRMFinder, you need to install devtools first, use the following code in R language.
+
+```R
+install.packages("devtools")
+```
+
+After installing devtools, install MRMFinder using the code below:
+
+```R
+devtools::install_github("zhengfj1994/MRM-Ion_Pair_Finder")
+```
+
+After successful installation, you can use the MRM_Ion_Pair_Finder function to select transitions.
+
+```R
+library(MRMFinder)
+data_ms1ms2_final <- MRM_Ion_Pair_Finder(file_MS1 = "F:\\MRM-Ion Pair Finder\\MS1\\Delete Iso-Add Result.csv",
+                                         filepath_MS2 = "F:\\MRM-Ion Pair Finder\\MS2",
+                                         tol_mz = 0.01,
+                                         tol_tr = 0.2,
+                                         diff_MS2MS1 = 13.9,
+                                         ms2_intensity = 750,
+                                         resultpath = "F:\\MRM-Ion Pair Finder",
+                                         OnlyKeepChargeEqual1 = T)
+```
+
+The meaning of parameters are shown below:
+
+| Parameters           | Meaning                                             |
+| :------------------- | :-------------------------------------------------- |
+| file_MS1             | MS1 file (.csv)                                     |
+| filepath_MS2         | filepath of MS2 file (.mgf)                         |
+| tol_mz               | m/z tolerance between MS1 and MS2 files             |
+| tol_rt               | retention time tolerance between MS1 and MS2 files  |
+| diff_MS2MS1          | smallest tolerance between precusor and product ion |
+| ms2_intensity        | smallest intensity of product ion                   |
+| resultpath           | result(.csv) filepath                               |
+| OnlyKeepChargeEqual1 | If TRUE, only keep the MS2 spectra with charge = 1. |
 
 
-#### Notice！！！
+##### Notice！！！
+
 The csv file of file_MS1 should follow the format as described in the pseudotargeted metabolomics paper (https://pubmed.ncbi.nlm.nih.gov/32581297/). It should contains "mz", "tr", and the columns for intensity.
 
-### Matlab
-There is a user mannal in "Matlab" folder. The user mannal contains the detials of how to use the software.
+
+
+#### Shiny
+
+In order to facilitate the use of users who are not used to using the R language, we also visualized based on shiny. After the MRMFinder is installed successfully, the user can use the following command to invoke the shiny visual interface.
+
+```R
+shiny::runApp(system.file('extdata/shinyApp', package = 'MRMFinder'))
+```
+
+<div align=center><img width="800" src="https://github.com/zhengfj1994/MRM-Ion_Pair_Finder/blob/master/screenshots/screenshot_of_shiny.png"/></div>
+<h4 align="center">
+Figure 1. Screenshot of Shiny
+</h4>
+
+
+#### Independent of R language
+
+For users who don't want to use R language, we provide a packaged independent program, users do not need to install R language.
+
+
 
 ### Codes for peak detection and annotation
-We provide the codes for peak detection, peak annotation and removing rundant features in the folder named "Peak detection and annotation". Users should used suitable parameters for peak detection and annoation and notice the ion mode.
+We provide the codes for peak detection, peak annotation and removing rundant features in the folder named "PeakDetectionAndAnnotation". Users should used suitable parameters for peak detection and annoation and notice the ion mode.
 
 ### Codes for retention time calibration
-We provide the codes for retention time calibration in the folder named "Retention time calibration". And we give the example data which are saved in .txt files. Users can easily calibrate retention time by using these codes.
+We provide the codes for retention time calibration in the folder named "RetentionTimeCalibration". And we give the example data which are saved in .txt files. Users can easily calibrate retention time by using these codes.
 
 ## Contact us
 If you have any problems when you use MRM_Ion_Pair_Finder. Please contact us, you can send an emial to zhengfj@dicp.ac.cn

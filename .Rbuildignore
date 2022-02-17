@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^screenshots$
+^PeakDetectionAndAnnotation$
+^RetentionTimeCalibration$
+^DemoData$

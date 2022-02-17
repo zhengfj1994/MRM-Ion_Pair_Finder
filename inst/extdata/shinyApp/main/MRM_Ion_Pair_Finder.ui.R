@@ -11,7 +11,7 @@ fluidPage(
              textInput("MS2FileFolder", label = "file folder (MS2)", value = "D:\\github\\MRM-Ion_Pair_Finder\\Data\\MS2"),
              textInput("resultpath", label = "Result Path", value = "D:\\github\\MRM-Ion_Pair_Finder\\Data"),
              width = 4,
-             height = 350,
+             height = 400,
            ),
            box(
              id = "Parameters.setting.peak.match",
@@ -19,7 +19,7 @@ fluidPage(
              numericInput(inputId = "tRtoleranceMin", label = "tR tolerance (min): tr tolerance between MS1 and MS2 files", value = 0.2),
              numericInput(inputId = "mzToleranceDa", label = "m/z tolerance (Da): m/z tolerance between MS1 and MS2 files", value = 0.01),
              width = 4,
-             height = 350
+             height = 400
            ),
            box(
              id = "Ion.removal.setting",
@@ -30,7 +30,7 @@ fluidPage(
                          choices = list("Yes" = T, "No" = F),
                          selected = T),
              width = 4,
-             height = 350
+             height = 400
            ),
 
   ),

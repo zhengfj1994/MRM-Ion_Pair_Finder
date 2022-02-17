@@ -7,7 +7,7 @@ source(
 shinyUI(
   dashboardPage(
     skin = "blue",
-    title = "MetEx",
+    title = "MRM-Ion Pair Finder",
     header = dashboardHeader(
       title = div("MRM-Ion Pair Finder")
       # titleWidth = 250
