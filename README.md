@@ -73,7 +73,9 @@ Figure 1. Screenshot of Shiny
 
 #### Independent of R language
 
-For users who don't want to use R language, we provide a packaged independent program, users do not need to install R language.
+For users who don't want to use R language, we provide a packaged independent program, users do not need to install R language. The download address is https://sourceforge.net/projects/mrm-ion-pair-finder/files/latest/download
+
+After downloading, unzip it, double-click MRMFinder.vbs to open an interface in your default browser, set the parameters, set the parameters and click the Run button to run.
 
 
 
