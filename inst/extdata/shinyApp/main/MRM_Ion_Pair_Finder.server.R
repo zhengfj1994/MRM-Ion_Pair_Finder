@@ -8,7 +8,7 @@ observeEvent(input$startMetEx, {
     filepath_MS2 <- input$MS2FileFolder
     resultpath <- input$resultpath
 
-    data_ms1ms2_final <- MRM_Ion_Pair_Finder(file_MS1 = file_MS1,
+    data_ms1ms2_final <- MRMFinder::MRM_Ion_Pair_Finder(file_MS1 = file_MS1,
                                              filepath_MS2 = filepath_MS2,
                                              tol_mz = input$mzToleranceDa,
                                              tol_tr = input$tRtoleranceMin,
