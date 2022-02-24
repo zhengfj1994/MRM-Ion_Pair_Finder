@@ -98,3 +98,7 @@ Expanded format support for mgf files.
 
 ### 2021/02/16
 Improve the efficiency of the R language and visualize it based on shiny. Remove the Matlab version.
+
+### 2021/02/24
+
+Add error notification.
