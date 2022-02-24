@@ -6,10 +6,10 @@ fluidPage(
            box(
              id = "MS1.MS2.data.file",
              h3("MS1, MS2 data and result file path"),
-             textInput("MS1FilePath", label = "file path (MS1)", value = "D:\\github\\MRM-Ion_Pair_Finder\\Data\\MS1\\Delete Iso-Add Result.csv"),
+             textInput("MS1FilePath", label = "file path (MS1)", value = "D:\\github\\MRM-Ion_Pair_Finder\\DemoData\\DemoMS1Data\\peakTable.csv"),
 
-             textInput("MS2FileFolder", label = "file folder (MS2)", value = "D:\\github\\MRM-Ion_Pair_Finder\\Data\\MS2"),
-             textInput("resultpath", label = "Result Path", value = "D:\\github\\MRM-Ion_Pair_Finder\\Data"),
+             textInput("MS2FileFolder", label = "file folder (MS2)", value = "D:\\github\\MRM-Ion_Pair_Finder\\DemoData\\DemoMS2Data"),
+             textInput("resultpath", label = "Result Path", value = "D:\\github\\MRM-Ion_Pair_Finder"),
              width = 4,
              height = 400,
            ),

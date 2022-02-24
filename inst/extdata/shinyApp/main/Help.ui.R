@@ -107,11 +107,11 @@ data_ms1ms2_final &lt;- MRM_Ion_Pair_Finder(file_MS1 = &quot;F:\\MRM-Ion Pair Fi
   <p>Expanded format support for mgf files.</p>
   <h3 id='20210216'>2021/02/16</h3>
   <p>Improve the efficiency of the R language and visualize it based on shiny. Remove the Matlab version.</p>
+  <h3 id='20210224'>2021/02/24</h3>
+  <p>Add error notification.</p>
 
 
                ")),
-      column(img(src = "The_workflow_of_MetEx.png", align = "center", width = "85%"), align = "center", width = 12),
-
       column(3)
 
   )
