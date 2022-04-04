@@ -13,6 +13,8 @@
 #'
 #' @return data_ms1ms2_final
 #' @export MRM_Ion_Pair_Finder
+#' @import doSNOW
+#' @import progress
 #' @importFrom readr parse_number
 #' @importFrom stringr str_detect
 #' @importFrom tcltk tkProgressBar setTkProgressBar
@@ -28,7 +30,11 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
                        diff_MS2MS1,
                        ms2_intensity,
                        resultpath,
-                       OnlyKeepChargeEqual1 = TRUE){
+                       OnlyKeepChargeEqual1 = TRUE,
+                       cores = 4){
+
+  library(doSNOW)
+  library(progress)
 
   # Function: exact a matrix from mgf_data
   ##########
@@ -203,31 +209,85 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
           # Combine ms1 and ms2
           mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))
           packageStartupMessage(paste("Combining MS1 and MS2."))
-          pb <- tcltk::tkProgressBar(paste("Combining MS1 and MS2 of", i_new),"rate of progress %", 0, 100)
-          for (i in c(1:nrow(mgf_matrix))){
-            info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
-            tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Combining MS1 and MS2 of", i_new, "(%s)"), info),info)
+
+          # cores <- parallel::detectCores()
+          cl <- makeSOCKcluster(cores)
+          registerDoSNOW(cl)
+
+          ptm <- proc.time()
+
+          # progress bar ------------------------------------------------------------
+          iterations <- nrow(mgf_matrix)
+          pb <- progress_bar$new(
+            format = ":letter [:bar] :elapsed | Remaining time: :eta <br>",
+            total = iterations,
+            width = 120)
+          # allowing progress bar to be used in foreach -----------------------------
+          progress <- function(n){
+            pb$tick(tokens = list(letter = "Progress of Combining MS1 and MS2."))
+          }
+          opts <- list(progress = progress)
+
+          ms1ms2Combiner <- function(i){
             mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
             trinmgf <- as.numeric(as.character(mgf_matrix$TR_num[i]))
             posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$tr-trinmgf) < tol_tr*60)
             if (length(posi)>=1){
               posi <- posi[1]
               ms1info <- before_pretreatment[posi,]
-              for (j in mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))]){
-                if (grepl("[a-zA-Z]", j)){
-                  next()
-                }else{
-                  mz_ms2 <- as.numeric(unlist(strsplit(j, " "))[1])
-                  int_ms2 <- as.numeric(unlist(strsplit(j, " "))[2])
-                  ms1ms2conb <- cbind(ms1info,mzinmgf,trinmgf,mz_ms2,int_ms2,CE)
-                  data_ms1ms2 <- rbind(data_ms1ms2,ms1ms2conb)
-                }
-              }
+              tempMS2 <- mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))]
+              tempMS2 <- tempMS2[which(!grepl("[a-zA-Z]", tempMS2))]
+              tempMS2 <- strsplit(tempMS2,split = " ")
+              tempMS2 <- do.call(rbind,lapply(tempMS2, rbind))
+              tempMS2 <- tempMS2[,c(1:2),drop=FALSE]
+              colnames(tempMS2)[1:2] <- c("mz_ms2", "int_ms2")
+              ms1ms2conb <- cbind(ms1info[rep(1,nrow(tempMS2)),],
+                                  rep(mzinmgf,nrow(tempMS2)),
+                                  rep(trinmgf,nrow(tempMS2)),
+                                  tempMS2,
+                                  rep(CE,nrow(tempMS2)))
+              colnames(ms1ms2conb) <- c(colnames(ms1info),"mzinmgf","trinmgf","mz_ms2","int_ms2","CE")
             }
+            else {
+              ms1ms2conb <- cbind(before_pretreatment[1,], mzinmgf=1, trinmgf=1, mz_ms2=1, int_ms2=1, CE=1)[-1,]
+            }
+            return(ms1ms2conb)
           }
-          close(pb)
+
+          ith_data_ms1ms2 <- foreach(i=1:nrow(mgf_matrix), .options.snow=opts, .combine='rbind') %dopar% ms1ms2Combiner(i)
+          stopCluster(cl)
+          data_ms1ms2 <- rbind(data_ms1ms2,ith_data_ms1ms2)
+
+          print(proc.time()-ptm)
+          packageStartupMessage("Combining MS1 and MS2 is finished")
+
+          # pb <- tcltk::tkProgressBar(paste("Combining MS1 and MS2 of", i_new),"rate of progress %", 0, 100)
+          # for (i in c(1:nrow(mgf_matrix))){
+          #   info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
+          #   tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Combining MS1 and MS2 of", i_new, "(%s)"), info),info)
+          #   mzinmgf <- as.numeric(as.character(mgf_matrix$Pepmass_num[i]))
+          #   trinmgf <- as.numeric(as.character(mgf_matrix$TR_num[i]))
+          #   posi <- which(abs(before_pretreatment$mz-mzinmgf) < tol_mz & abs(before_pretreatment$tr-trinmgf) < tol_tr*60)
+          #   if (length(posi)>=1){
+          #     posi <- posi[1]
+          #     ms1info <- before_pretreatment[posi,]
+          #     for (j in mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))]){
+          #       if (grepl("[a-zA-Z]", j)){
+          #         next()
+          #       }else{
+          #         mz_ms2 <- as.numeric(unlist(strsplit(j, " "))[1])
+          #         int_ms2 <- as.numeric(unlist(strsplit(j, " "))[2])
+          #         ms1ms2conb <- cbind(ms1info,mzinmgf,trinmgf,mz_ms2,int_ms2,CE)
+          #         data_ms1ms2 <- rbind(data_ms1ms2,ms1ms2conb)
+          #       }
+          #     }
+          #   }
+          # }
+          # close(pb)
         }
 
+        data_ms1ms2$int_ms2 <- as.numeric(data_ms1ms2$int_ms2)
+        data_ms1ms2$mz_ms2 <- as.numeric(data_ms1ms2$mz_ms2)
         data_ms1ms2_final <- data_ms1ms2[1,][-1,]
         uniquedata_ms1ms2 <- dplyr::distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
         for (i in c(1:nrow(uniquedata_ms1ms2))){

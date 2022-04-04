@@ -32,6 +32,13 @@ fluidPage(
              width = 4,
              height = 400
            ),
+           box(
+             id = "cores",
+             h3("Cores for parallel computing"),
+             sliderInput("cores", "Number of cores for parallel computing. The default is 4, which can be adjusted according to your computer's CPU.", min = 1, max = 64, value = 4, animate = TRUE),
+             width = 12,
+             height = 200
+           ),
 
   ),
   fluidRow(

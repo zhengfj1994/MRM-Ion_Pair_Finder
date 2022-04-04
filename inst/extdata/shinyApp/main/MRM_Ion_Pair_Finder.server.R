@@ -15,7 +15,8 @@ observeEvent(input$startMetEx, {
                                              diff_MS2MS1 = input$toleranceMS1MS2,
                                              ms2_intensity = input$toleranceMS2Intensity,
                                              resultpath = resultpath,
-                                             OnlyKeepChargeEqual1 = input$OnlyKeepChargeEqual1)
+                                             OnlyKeepChargeEqual1 = input$OnlyKeepChargeEqual1,
+                                             cores = input$cores)
     if (class(data_ms1ms2_final) == "logical"){
       URL <<- "Error.png"
     }

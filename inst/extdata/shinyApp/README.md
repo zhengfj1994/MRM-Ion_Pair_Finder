@@ -65,7 +65,7 @@ In order to facilitate the use of users who are not used to using the R language
 shiny::runApp(system.file('extdata/shinyApp', package = 'MRMFinder'))
 ```
 
-<div align=center><img width="800" src="https://github.com/zhengfj1994/MRM-Ion_Pair_Finder/blob/master/screenshots/screenshot_of_shiny.png"/></div>
+<div align=center><img width="800" src="screenshot_of_shiny.png"/></div>
 <h4 align="center">
 Figure 1. Screenshot of Shiny
 </h4>

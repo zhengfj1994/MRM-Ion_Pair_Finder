@@ -1,13 +1,16 @@
 Package: MRMFinder
 Type: Package
 Title: MRM-Ion Pair Finder
-Version: 2.1.0
+Version: 2.2.0
 Author: Zheng Fujian
 Maintainer: Zheng Fujian <zhengfj@dicp.ac.cn>
 Imports: readr,
          stringr,
          dplyr,
-         tidyr
+         tidyr,
+         doSNOW,
+         progress,
+         markdown
 Suggest: shiny,
          shinydashboard,
          shinycssloaders,

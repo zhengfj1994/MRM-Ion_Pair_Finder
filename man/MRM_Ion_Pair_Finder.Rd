@@ -12,7 +12,8 @@ MRM_Ion_Pair_Finder(
   diff_MS2MS1,
   ms2_intensity,
   resultpath,
-  OnlyKeepChargeEqual1 = TRUE
+  OnlyKeepChargeEqual1 = TRUE,
+  cores = 4
 )
 }
 \arguments{
