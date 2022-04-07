@@ -16,6 +16,7 @@ observeEvent(input$startMetEx, {
                                              ms2_intensity = input$toleranceMS2Intensity,
                                              resultpath = resultpath,
                                              OnlyKeepChargeEqual1 = input$OnlyKeepChargeEqual1,
+                                             NumOfProductIons = input$NumOfProductIons,
                                              cores = input$cores)
     if (class(data_ms1ms2_final) == "logical"){
       URL <<- "Error.png"

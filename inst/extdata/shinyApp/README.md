@@ -34,21 +34,25 @@ data_ms1ms2_final <- MRM_Ion_Pair_Finder(file_MS1 = "F:\\MRM-Ion Pair Finder\\MS
                                          diff_MS2MS1 = 13.9,
                                          ms2_intensity = 750,
                                          resultpath = "F:\\MRM-Ion Pair Finder",
-                                         OnlyKeepChargeEqual1 = T)
+                                         OnlyKeepChargeEqual1 = T,
+                       					 NumOfProductIons = 1,
+                                         cores = 4)
 ```
 
 The meaning of parameters are shown below:
 
-| Parameters           | Meaning                                             |
-| :------------------- | :-------------------------------------------------- |
-| file_MS1             | MS1 file (.csv)                                     |
-| filepath_MS2         | filepath of MS2 file (.mgf)                         |
-| tol_mz               | m/z tolerance between MS1 and MS2 files             |
-| tol_rt               | retention time tolerance between MS1 and MS2 files  |
-| diff_MS2MS1          | smallest tolerance between precusor and product ion |
-| ms2_intensity        | smallest intensity of product ion                   |
-| resultpath           | result(.csv) filepath                               |
-| OnlyKeepChargeEqual1 | If TRUE, only keep the MS2 spectra with charge = 1. |
+| Parameters           | Meaning                                                      |
+| :------------------- | :----------------------------------------------------------- |
+| file_MS1             | MS1 file (.csv)                                              |
+| filepath_MS2         | filepath of MS2 file (.mgf)                                  |
+| tol_mz               | m/z tolerance between MS1 and MS2 files                      |
+| tol_rt               | retention time tolerance between MS1 and MS2 files           |
+| diff_MS2MS1          | smallest tolerance between precusor and product ion          |
+| ms2_intensity        | smallest intensity of product ion                            |
+| resultpath           | result(.csv) filepath                                        |
+| OnlyKeepChargeEqual1 | If TRUE, only keep the MS2 spectra with charge = 1.          |
+| NumOfProductIons     | Number of product ions kept for each precursor ion. The default is 1. |
+| cores                | Number of CPU cores used for parallel computing. The default is 4. |
 
 
 ##### Notice！！！
@@ -106,3 +110,8 @@ Add error notification.
 ### 2021/04/04
 
 Parallel computing increases speed.
+
+### 2021/04/07
+
+Added option to retain multiple product ions.
+

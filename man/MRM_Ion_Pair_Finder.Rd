@@ -13,6 +13,7 @@ MRM_Ion_Pair_Finder(
   ms2_intensity,
   resultpath,
   OnlyKeepChargeEqual1 = TRUE,
+  NumOfProductIons = 1,
   cores = 4
 )
 }
@@ -34,6 +35,10 @@ intensity of samples is located begin the third column.}
 \item{resultpath}{A csv file named "MRM transitions list.csv" will saved in the path.}
 
 \item{OnlyKeepChargeEqual1}{T or F}
+
+\item{NumOfProductIons}{Number of product ions kept for each precursor ion. The default is 1.}
+
+\item{cores}{Number of CPU cores used for parallel computing. The default is 4.}
 }
 \value{
 data_ms1ms2_final

@@ -36,7 +36,14 @@ fluidPage(
              id = "cores",
              h3("Cores for parallel computing"),
              sliderInput("cores", "Number of cores for parallel computing. The default is 4, which can be adjusted according to your computer's CPU.", min = 1, max = 64, value = 4, animate = TRUE),
-             width = 12,
+             width = 6,
+             height = 200
+           ),
+           box(
+             id = "NumOfProductIons",
+             h3("Number of product ions."),
+             numericInput(inputId = "NumOfProductIons", label = "Number of product ions kept for each precursor ion. The default is 1.", value = 1),
+             width = 6,
              height = 200
            ),
 

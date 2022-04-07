@@ -10,6 +10,8 @@
 #' @param ms2_intensity The smallest intensity of product ion.
 #' @param resultpath A csv file named "MRM transitions list.csv" will saved in the path.
 #' @param OnlyKeepChargeEqual1 T or F
+#' @param NumOfProductIons Number of product ions kept for each precursor ion. The default is 1.
+#' @param cores Number of CPU cores used for parallel computing. The default is 4.
 #'
 #' @return data_ms1ms2_final
 #' @export MRM_Ion_Pair_Finder
@@ -31,6 +33,7 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
                        ms2_intensity,
                        resultpath,
                        OnlyKeepChargeEqual1 = TRUE,
+                       NumOfProductIons = 1,
                        cores = 4){
 
   library(doSNOW)
@@ -290,13 +293,49 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
         data_ms1ms2$mz_ms2 <- as.numeric(data_ms1ms2$mz_ms2)
         data_ms1ms2_final <- data_ms1ms2[1,][-1,]
         uniquedata_ms1ms2 <- dplyr::distinct(data_ms1ms2[,1:ncol(before_pretreatment)])
-        for (i in c(1:nrow(uniquedata_ms1ms2))){
+
+
+        packageStartupMessage(paste("Data Integration"))
+        cl <- makeSOCKcluster(cores)
+        registerDoSNOW(cl)
+        ptm <- proc.time()
+        # progress bar ------------------------------------------------------------
+        iterations <- nrow(uniquedata_ms1ms2)
+        pb <- progress_bar$new(
+          format = ":letter [:bar] :elapsed | Remaining time: :eta <br>",
+          total = iterations,
+          width = 120)
+        # allowing progress bar to be used in foreach -----------------------------
+        progress <- function(n){
+          pb$tick(tokens = list(letter = "Progress of Data Integration."))
+        }
+        opts <- list(progress = progress)
+
+        DataIntegration <- function(i){
           posi <- which(data_ms1ms2$mz==uniquedata_ms1ms2$mz[i] & data_ms1ms2$tr==uniquedata_ms1ms2$tr[i])
           temp <- data_ms1ms2[posi,]
-          posi <- which(temp$int_ms2 == max(temp$int_ms2))
-          temp <- temp[posi[1],]
-          data_ms1ms2_final <- rbind(data_ms1ms2_final,temp)
+          # posi <- which(temp$int_ms2 == max(temp$int_ms2))
+          posi <- order(temp$int_ms2,decreasing=TRUE)[1:NumOfProductIons]
+          posi <- as.numeric(na.omit(posi))
+          temp <- temp[posi,]
+          return(temp)
         }
+
+        data_ms1ms2_final <- foreach(i=1:nrow(uniquedata_ms1ms2), .options.snow=opts, .combine='rbind') %dopar% DataIntegration(i)
+        stopCluster(cl)
+
+        print(proc.time()-ptm)
+        packageStartupMessage("Data Integration is finished")
+
+        # for (i in c(1:nrow(uniquedata_ms1ms2))){
+        #   posi <- which(data_ms1ms2$mz==uniquedata_ms1ms2$mz[i] & data_ms1ms2$tr==uniquedata_ms1ms2$tr[i])
+        #   temp <- data_ms1ms2[posi,]
+        #   # posi <- which(temp$int_ms2 == max(temp$int_ms2))
+        #   posi <- order(temp$int_ms2,decreasing=TRUE)[1:NumOfProductIons]
+        #   posi <- as.numeric(na.omit(posi))
+        #   temp <- temp[posi,]
+        #   data_ms1ms2_final <- rbind(data_ms1ms2_final,temp)
+        # }
 
         WriteCsvChecker = tryCatch({
           write.csv(data_ms1ms2_final,file = paste0(resultpath, "/", "MRM transitions list.csv"),row.names = FALSE)
