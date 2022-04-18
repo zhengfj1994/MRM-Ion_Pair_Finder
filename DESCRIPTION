@@ -1,7 +1,7 @@
 Package: MRMFinder
 Type: Package
 Title: MRM-Ion Pair Finder
-Version: 2.3.0
+Version: 2.3.1
 Author: Zheng Fujian
 Maintainer: Zheng Fujian <zhengfj@dicp.ac.cn>
 Imports: readr,
