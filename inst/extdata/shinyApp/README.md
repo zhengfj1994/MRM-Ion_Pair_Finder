@@ -104,14 +104,14 @@ Expanded format support for mgf files.
 Improve the efficiency of the R language and visualize it based on shiny. Remove the Matlab version.
 
 ### 2021/02/24
-
 Add error notification.
 
 ### 2021/04/04
-
 Parallel computing increases speed.
 
 ### 2021/04/07
-
 Added option to retain multiple product ions.
+
+### 2022/07/19
+Expanded format support for mgf files.
 
