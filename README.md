@@ -69,7 +69,7 @@ In order to facilitate the use of users who are not used to using the R language
 shiny::runApp(system.file('extdata/shinyApp', package = 'MRMFinder'))
 ```
 
-<div align=center><img width="800" src="https://github.com/zhengfj1994/MRM-Ion_Pair_Finder/blob/master/screenshots/screenshot_of_shiny.png"/></div>
+<div align=center><img width="800" src="screenshot_of_shiny.png"/></div>
 <h4 align="center">
 Figure 1. Screenshot of Shiny
 </h4>
@@ -104,14 +104,14 @@ Expanded format support for mgf files.
 Improve the efficiency of the R language and visualize it based on shiny. Remove the Matlab version.
 
 ### 2021/02/24
-
 Add error notification.
 
 ### 2021/04/04
-
 Parallel computing increases speed.
 
 ### 2021/04/07
-
 Added option to retain multiple product ions.
+
+### 2022/07/19
+Expanded format support for mgf files.
 

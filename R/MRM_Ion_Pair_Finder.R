@@ -194,13 +194,13 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
 
           # Delete the data without useful MS2
           ########
-          mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))  # creat mgf_matrix
+          mgf_matrix <- as.data.frame(createmgfmatrix(mgf_data))  # create mgf_matrix
           packageStartupMessage(paste("Deleting the data in", i_new, "without useful MS2."))
           pb <- tcltk::tkProgressBar(paste("Delete the data in", i_new, "without useful MS2"),"rate of progress %", 0, 100)
           for (i in c(1:nrow(mgf_matrix))){
             info <- sprintf("rate of progress %d%%", round(i*100/nrow(mgf_matrix)))
             tcltk::setTkProgressBar(pb, i*100/nrow(mgf_matrix), sprintf(paste("Delete the data in", i_new, "without useful MS2 (%s)"), info),info)
-            if (as.numeric(as.character(mgf_matrix$End_num[i])) - as.numeric(as.character(mgf_matrix$Begin_num[i])) < 5){
+            if (length(which(!grepl("[a-zA-Z]", mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))]))) == 0){
               mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))] <- NA
             }
           }
