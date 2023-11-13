@@ -239,7 +239,8 @@ MRM_Ion_Pair_Finder <- function(file_MS1,
               posi <- posi[1]
               ms1info <- before_pretreatment[posi,]
               tempMS2 <- mgf_data[as.numeric(as.character(mgf_matrix$Begin_num[i])):as.numeric(as.character(mgf_matrix$End_num[i]))]
-              tempMS2 <- tempMS2[which(!(grepl("[a-dA-D]", tempMS2) & grepl("[f-zF-Z]", tempMS2)))]
+              tempMS2 <- tempMS2[which(!(grepl("[a-dA-D]", tempMS2) | grepl("[f-zF-Z]", tempMS2)))]
+              # tempMS2 <- tempMS2[which(!(grepl("[a-dA-D]", tempMS2) & grepl("[f-zF-Z]", tempMS2)))]
               ## tempMS2 <- tempMS2[which(!grepl("[a-zA-Z]", tempMS2))]
               tempMS2 <- strsplit(tempMS2,split = " ")
               tempMS2 <- do.call(rbind,lapply(tempMS2, rbind))
